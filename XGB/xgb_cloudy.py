@@ -11,7 +11,8 @@ import xgboost as xgb
 np.random.seed(42)
 
    
-co = pymysql.connect(host=os.environ['MdB_HOST'], db=os.environ['MdB_DBp'], user=os.environ['MdB_USER'], passwd=os.environ['MdB_PASSWD'])res = pd.read_sql("select com1, com2, com3, com4, com5,HbFrac, N__2_654805A, N__2_658345A,  H__1_656281A, H__1_486133A, O__3_500684A, O__1_630030A,S__2_671644A   from tab_17 where ref = 'BOND' and HbFrac > 0.7", con=co)
+co = pymysql.connect(host=os.environ['MdB_HOST'], db=os.environ['MdB_DBp'], user=os.environ['MdB_USER'], passwd=os.environ['MdB_PASSWD'])
+res = pd.read_sql("select com1, com2, com3, com4, com5,HbFrac, N__2_654805A, N__2_658345A,  H__1_656281A, H__1_486133A, O__3_500684A, O__1_630030A,S__2_671644A   from tab_17 where ref = 'BOND' and HbFrac > 0.7", con=co)
 co.close()
 
 #res.to_csv('raies_3mdb.csv', sep='\t')
