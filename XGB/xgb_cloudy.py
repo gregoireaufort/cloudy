@@ -1,4 +1,4 @@
-
+import os
 import pandas as pd
 import pymysql
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ import xgboost as xgb
 np.random.seed(42)
 
    
-co = pymysql.connect(host='3mdb.astro.unam.mx', db='3MdB_17', user='OVN_user', passwd='oiii5007')
+co = pymysql.connect(host='3mdb.astro.unam.mx', db='3MdB_17', user='OVN_user', passwd=os.environ['3mdb_pwd'])
 res = pd.read_sql("select com1, com2, com3, com4, com5,HbFrac, N__2_654805A, N__2_658345A,  H__1_656281A, H__1_486133A, O__3_500684A, O__1_630030A,S__2_671644A   from tab_17 where ref = 'BOND' and HbFrac > 0.7", con=co)
 co.close()
 
