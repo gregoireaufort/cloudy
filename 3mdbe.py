@@ -2,11 +2,10 @@
 """
 Created on Thu Mar 19 15:03:32 2020
 
-@author: groet
+@author: greg
 """
 
-
-
+import os
 import pandas as pd
 import pymysql
 import matplotlib.pyplot as plt
@@ -30,7 +29,7 @@ def create_model(dense_1,dropout_rate = 0.1,lr=0.05):
                     input_shape =input_shape, 
                     activation="relu"))
     model.add(Dropout(dropout_rate)) 
-    model.add(Dense(5, activation='relu'))
+    model.add(Dense(7, activation='relu'))
     # Compile model
     model.compile(loss='mean_squared_error', 
                   optimizer='adam', 
@@ -38,15 +37,15 @@ def create_model(dense_1,dropout_rate = 0.1,lr=0.05):
     return model
 
     
-co = pymysql.connect(host='3mdb.astro.unam.mx', db='3MdB_17', user='OVN_user', passwd='oiii5007')
-res = pd.read_sql("select com1, com2, com3, com4, com5,HbFrac, N__2_654805A, N__2_658345A,  H__1_656281A, H__1_486133A, O__3_500684A from tab_17 where ref = 'BOND' and HbFrac > 0.7", con=co)
+co = pymysql.connect(host='3mdb.astro.unam.mx', db='3MdB_17', user='OVN_user', passwd=os.environ['3mdb_pwd'])
+res = pd.read_sql("select com1, com2, com3, com4, com5,HbFrac, N__2_654805A, N__2_658345A,  H__1_656281A, H__1_486133A, O__3_500684A, O__1_630030A,S__2_671644A   from tab_17 where ref = 'BOND' and HbFrac > 0.7", con=co)
 co.close()
 
 #res.to_csv('raies_3mdb.csv', sep='\t')
 
 #, "CA_B_656281A", "CA_B_486133A",
 res.head()
-raies = ["N__2_654805A", "N__2_658345A",  "H__1_656281A", "H__1_486133A", "O__3_500684A"]
+raies = ["N__2_654805A", "N__2_658345A",  "H__1_656281A", "H__1_486133A", "O__3_500684A", "O__1_630030A","S__2_671644A"]
 y =  np.array(np.log(res[raies]))
 params = ["com1", "com2", "com3", "com4", "com5","HbFrac"]
 X= res[params]
@@ -73,8 +72,8 @@ model = KerasRegressor(build_fn=create_model, verbose=0)
 ##############################################################
 # grid search
 lr = [0.001, 0.01,0.1]
-dropout_rate = [0.1,0.2]
-dense_1 = [32,64,128,256]
+dropout_rate = [0.1,0.2,0.3]
+dense_1 = [64,128,256,512]
 batch_size = [1000] 
 epochs = [1000]
 param_grid = dict(epochs=epochs, 
@@ -91,9 +90,9 @@ grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=1,return_trai
 
 ##############################################################
 
-#joblib.dump(grid.best_estimator_, 'NN_lines.pkl', compress = 1)
+#joblib.dump(grid.best_estimator_, 'NN_lines_2.pkl', compress = 1)
 
-model = joblib.load('NN_lines.pkl')
+model = joblib.load('NN_lines_2.pkl')
 
 y_est_test = model.predict(X_test)
 
@@ -114,7 +113,7 @@ plt.scatter(y_true[:,2],y_est_test[:,2])
 renorm_est = np.exp(np.float64(y_est_test))
 renorm_true = np.exp(y_true)
 
-for i in range(5):
+for i in range(7):
     fig = plt.figure()
     ax = plt.gca()
     ax.scatter(renorm_true[:,i],renorm_est[:,i] , c='blue', alpha=0.1, edgecolors='none')
@@ -123,7 +122,7 @@ for i in range(5):
     plt.ylabel('Estimated', fontsize=16)
     ax.set_yscale('log')
     ax.set_xscale('log')
-    plt.savefig(raies[i]+'.png')
+    plt.savefig(raies[i]+'_7raies.png')
 
 
 fig = plt.figure()
